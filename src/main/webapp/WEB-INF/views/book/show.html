@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>书库</title>
+    <script th:src="@{/static/js/jquery-3.6.0.js}"></script>
+    <link rel="stylesheet" type="text/css" th:href="@{/static/css/show.css}">
+</head>
+<body>
+
+<div style="height: 50px">
+    <div style="float: left;height: 100%">
+        <img id="back-index" style="max-height: 50%;margin: 5%" th:src="@{/static/img/arrow-left-square.png}" />
+        <script>
+            $("#back-index").click(function () {
+                location.href = "/ssm/";
+            });
+        </script>
+    </div>
+    <h1>Welcome to My BookRepository!</h1>
+</div>
+<div id="div-bar">
+    <div id="div-user">
+        <span class="menu" style="color: red;" th:text="${session.username}"><b></b></span>
+        <span class="menu"><a id="menu-logout" th:href="@{/userLogout}">注销</a></span>
+    </div>
+    <div id="div-operation">
+        <span class="menu"><a id="menu-add" th:href="@{/book/edit(pageNo=${pageInfo.getPageNum()})}">添加一本书</a></span>
+    </div>
+</div>
+
+<div id="div-show">
+    <input id="books" type="hidden" th:value="${books}">
+
+    <form id="form-update" th:method="POST">
+        <input type="hidden" name="_method" value="PUT" />
+        <input type="hidden" name="pageNo" th:value="${pageInfo.getPageNum()}">
+    </form>
+    <form id="form-delete" th:method="POST">
+        <input type="hidden" name="_method" value="DELETE" />
+        <input id="delete-size" type="hidden" name="pageNo">
+    </form>
+</div>
+<script type="text/javascript" th:inline="javascript">
+        function createDiv(book) {
+            var div = document.createElement('div');
+            div.innerHTML = '<div class=' + '"' + 'show-img' + '"' + '>' +
+                '<div class=' + '"' + 'img-space' + '"' + '>' +
+                '<img class=' + '"' + 'item-img' + '"' +  ' src=' + '"' + '/ssm' + book.imgPath + '"' + ' />' +
+                '</div>' +
+                '<div class=' + '"' + 'show-operation' + '"' + '>' +
+                '<div class=' + '"' + 'operation-space' + '"' + '>' +
+                '<a class=' + '"' + 'item-operation update' + '"' + ' href=' + '"' + '/ssm/book/edit/' + book.bookId + '"' + '>' + '更新' + '</a>' +
+                '</div>' +
+                '<div class=' + '"' + 'operation-space' + '"' + '>' +
+                '<a class=' + '"' + 'item-operation delete' + '"' + ' href=' + '"' + '/ssm/book/delete/' + book.bookId + '"' + '>' + '删除' + '</a>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '<div class=' + '"' + 'show-msg' + '"' + '>' +
+                '<div class=' + '"' + 'itm-msg' + '"' + '>' +
+                '<p class=' + '"' + 'p-msg' + '"' + '>' + '书名：《' + book.bookName + '》' + '</p>' +
+                '<p class=' + '"' + 'p-msg' + '"' + '>' + '作者：' + book.author + '</p>' +
+                '<p class=' + '"' + 'p-msg' + '"' + '>' + '出版社：' + book.press + '</p>' +
+                '<p class=' + '"' + 'p-msg' + '"' + '>' + '读后感：' + book.bookImpression + '</p>' +
+                '</div>' +
+                '</div>';
+            div.className  = "show-item";
+            var show = document.getElementById("div-show");
+            show.appendChild(div);
+        }
+
+        $(function () {
+            var booksJson = $("#books").val();
+            var books = JSON.parse(booksJson);
+            $.each(books, function (index, book) {
+                createDiv(book);
+            });
+
+            $(".delete").click(function (event) {
+                event.preventDefault();
+                var size = parseInt($("#size").val());
+                var pageNo = parseInt($("#pageNo").val());
+                if (size === 1)
+                    pageNo -= 1;
+                $("#delete-size").val(pageNo);
+                var form = $("#form-delete");
+                form.attr("action", event.target.href);
+                form.submit();
+            });
+            $(".update").click(function (event) {
+                event.preventDefault();
+                var form = $("#form-update");
+                form.attr("action", event.target.href);
+                form.submit();
+            });
+        });
+    </script>
+
+<div id="page">
+    <input id="pageNo" type="hidden" th:value="${pageInfo.getPageNum()}">
+    <input id="pageSize" type="hidden" th:value="${pageInfo.getPageSize()}">
+    <input id="size" type="hidden" th:value="${pageInfo.getSize()}">
+    <input id="totalPages" type="hidden" th:value="${pageInfo.getPages()}">
+    <input id="totalBooks" type="hidden" th:value="${pageInfo.getTotal()}">
+
+    <a id="pageFirst" class="item-pageNo" th:href="@{/book/page/1}">首页</a>
+    <a id="pageUp" class="item-pageNo" th:href="@{'/book/page/' + ${pageInfo.getPageNum() - 1}}">上一页</a>
+    第
+    <span id="pages"></span>
+    页
+    <a id="pageDown" class="item-pageNo" th:href="@{'/book/page/' + ${pageInfo.getPageNum() + 1}}">下一页</a>
+    <a id="pageLast" class="item-pageNo" th:href="@{'/book/page/' + ${pageInfo.getPages()}}">末页</a>
+    <script type="text/javascript">
+        $(function () {
+            var pageNo = parseInt($("#pageNo").val());
+            var totalPages = parseInt($("#totalPages").val());
+            var begin;
+            var end;
+            if (pageNo === 1) {
+                $("#pageFirst").attr("disabled", true);
+                $("#pageFirst").removeAttr("href");
+                $("#pageUp").attr("disabled", true);
+                $("#pageUp").removeAttr("href");
+            }
+            if (pageNo === totalPages) {
+                $("#pageLast").attr("disabled", true);
+                $("#pageLast").removeAttr("href");
+                $("#pageDown").attr("disabled", true);
+                $("#pageDown").removeAttr("href");
+            }
+            if (totalPages <= 5) {
+                begin = 1;
+                end = totalPages;
+            } else if (totalPages > 5) {
+                if (pageNo <= 3) {
+                    begin = 1;
+                    end = 5;
+                } else if (pageNo >= totalPages -3) {
+                    begin = totalPages - 4;
+                    end = totalPages;
+                } else {
+                    begin = pageNo - 2;
+                    end = pageNo + 2;
+                }
+            }
+            for (let i = end; i >= begin ; i--) {
+                createA(i, pageNo);
+            }
+        });
+
+        function createA(i, pageNo) {
+            var a = document.createElement("a");
+            if (i === pageNo) {
+                a.text = "【" + i + "】";
+            } else {
+                a.innerHTML = 'href=' + '"' + '/ssm/book/page/' + i + '"';
+                a.href = "/ssm/book/page/" + i;
+                a.text =  i;
+            }
+            a.className = "item-pageNo";
+            var pages = document.getElementById("pages");
+            pages.insertBefore(a, pages.firstChild);
+        }
+    </script>
+</div>
+</body>
+</html>

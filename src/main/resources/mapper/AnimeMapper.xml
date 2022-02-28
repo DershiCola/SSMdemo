@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dershi.dao.AnimeMapper">
+    <!--  开启二级缓存  -->
+    <cache
+        eviction="FIFO"
+        flushInterval="60000"
+        readOnly="true"
+        size="128"
+    />
+
+    <select id="getAllAnimes" resultType="anime">
+        select * from anime
+    </select>
+
+    <select id="getAnimeById" resultType="anime">
+        select * from anime where anime_id=#{animeId}
+    </select>
+
+    <insert id="addAnime" parameterType="anime" useGeneratedKeys="true" keyColumn="animeId">
+        insert into anime
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="animeName != null and animeName != ''">anime_name,</if>
+            <if test="imgPath != null and imgPath != ''">img_path,</if>
+            <if test="animeImpression != null and animeImpression != ''">anime_impression</if>
+        </trim>
+        <trim prefix="values(" suffix=")" suffixOverrides=",">
+            <if test="animeName != null and animeName != ''">#{animeName},</if>
+            <if test="imgPath != null and imgPath != ''">#{imgPath},</if>
+            <if test="animeImpression != null and animeImpression != ''">#{animeImpression}</if>
+        </trim>
+    </insert>
+
+    <delete id="deleteAnimeById">
+        delete from anime where anime_id=#{animeId}
+    </delete>
+
+    <update id="updateAnimeById" parameterType="map">
+        update anime
+        <set>
+            <if test="animeName != null">anime_name=#{animeName},</if>
+            <if test="imgPath != null">img_path=#{imgPath},</if>
+            <if test="animeImpression != null">anime_impression=#{animeImpression}</if>
+        </set>
+        where anime_id=#{animeId}
+    </update>
+</mapper>

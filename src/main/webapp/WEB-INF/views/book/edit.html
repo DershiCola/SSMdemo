@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit</title>
+    <script th:src="@{/static/js/jquery-3.6.0.js}"></script>
+    <link rel="stylesheet" type="text/css" th:href="@{/static/css/login.css}">
+    <script>
+        $(function () {
+            // 点击图片返回书籍信息列表
+            const logo = $("#logo_edit");
+            $(logo).fadeIn(1000);
+            $(logo).click(function () {
+                location.href= "/ssm/book/page/1";
+            });
+
+            $("#btn-edit").click(function () {
+                const bookName = $(".edit[name='bookName']").val();
+                if (bookName == null || bookName === "") {
+                    alert("书名不能为空！");
+                    return false;
+                }
+            });
+        })
+    </script>
+</head>
+<body>
+<div class="main">
+    <div class="login_left">
+        <img class="logo" id="logo_edit" th:src="@{/static/img/book_edit.jpg}" />
+    </div>
+    <div class="content">
+        <div class="title">
+            <h1 style="color: deepskyblue;">图书编辑</h1>
+        </div>
+        <div id="list_edit" >
+            <div style="height: 40px;">
+            </div><br>
+            <div class="show-list">
+                <form id="form-edit" enctype="multipart/form-data" method="POST">
+                    <input id="bookId" type="hidden" name="bookId" th:value="${bookId}" />
+                    <input type="hidden" name="pageNo" th:value="${pageNo}" />
+                    <input id="method-put" type="hidden" name="_method">
+                    <script>
+                        $(function () {
+                            var form = $("#form-edit");
+                            var put = $("#method-put");
+                            var id = parseInt($("#bookId").val());
+                            if (id != null && id > 0) {
+                                put.attr("value", "PUT");
+                                form.attr("action", "/ssm/book/update/" + id);
+                            } else {
+                                put.attr("value", "POST");
+                                form.attr("action", "/ssm/book/add");
+                            }
+                        })
+                    </script>
+                    <table id="list2">
+                        <tr>
+                            <th>书名</th>
+                            <td><input type="text" class="edit" name="bookName" th:value="${bookName}" /></td>
+                        </tr>
+                        <tr>
+                            <th>作者</th>
+                            <td><input type="text" class="edit" name="author" th:value="${author}" /></td>
+                        </tr>
+                        <tr>
+                            <th>出版社</th>
+                            <td><input type="text" class="edit" name="press" th:value="${press}" /></td>
+                        </tr>
+                        <tr>
+                            <th>封面</th>
+                            <td><input type="file" class="edit" name="bookImgFile" /></td>
+                        </tr>
+                        <tr>
+                            <th>读后感</th>
+                            <td>
+                                <label>
+                                    <textarea cols="50" rows="20" class="edit-imp" name="bookImpression" th:text="${bookImpression}"></textarea>
+                                </label>
+                            </td>
+                        </tr>
+                    </table>
+                    <div style="text-align: center">
+                        <input type="submit" id="btn-edit" value="提交" />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

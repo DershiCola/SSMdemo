@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>index</title>
+    <script th:src="@{/static/js/jquery-3.6.0.js}"></script>
+    <link rel="stylesheet" th:href="@{/static/css/login.css}">
+    <script>
+      $(function () {
+        // 点击图片返回首页
+        const logo = $("#logo_login");
+        $(logo).fadeIn(1000);
+        $(logo).click(function () {
+          location.href = "/ssm/";
+        });
+
+        // 登录表单提交
+        $("#btn-login").click(function (event) {
+          const usernameVal = $(":text[name='username']").val();
+          // 通过AJAX向服务器发送请求判断用户名是否可用
+          var flag = false;
+          $.ajax({
+            url : "http://localhost:8080/ssm/ajaxExistsUsername",
+            data : {username : usernameVal},
+            type : "GET",
+            async : false,  // 开启同步
+            dataType : "json",
+            success : function (data) {
+              if (data.checkUsername) {
+                flag = true;
+              }
+            }
+          });
+          if (!flag) {
+            alert("用户名'" + usernameVal + "'不存在");
+            event.preventDefault();
+            return false;
+          } else {
+            alert("登录成功");
+          }
+        });
+      });
+    </script>
+</head>
+<body>
+<div class="main">
+  <div class="login_left">
+    <img class="logo" id="logo_login" th:src="@{/static/img/login.png}" />
+  </div>
+  <div class="content">
+    <div class="title">
+      <h1>Welcome to My Website</h1>
+    </div>
+    <div class="blank"></div>
+    <div id="login_box" class="box">
+      <div class="box_title">
+        <label style="font-size: 20px"><b>登录</b></label>
+        <span id="loginWarn" class="warnMsg" th:text="${loginMsg}"></span>
+      </div><br />
+      <div class="show">
+        <form th:action="@{/userLogin}" th:method="post" id="login_form">
+          <input type="hidden" name="action" value="login">
+          <label for="username">用户名称：</label><input type="text" class="txt" name="username" id="username" placeholder="请输入用户名" th:value="${username}" /><br /><br />
+          <label for="password">用户密码：</label><input type="password" class="txt" name="password" id="password" placeholder="请输入密码" /><br /><br />
+          <div id="btn-box">
+            <input th:type="submit" id="btn-login" class="button" value="登录">
+            <a id="btn-register" class="button" th:href="@{/register}">注册</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="footer" style="text-align: center;font-size: 10px;color: #cccccc;height: 15px">
+  <span style="text-align: center">
+    Dershi.Copyright ©2022
+  </span>
+</div>
+</body>
+</html>

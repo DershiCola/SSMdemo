@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>register</title>
+    <script th:src="@{/static/js/jquery-3.6.0.js}"></script>
+    <link rel="stylesheet" th:href="@{/static/css/login.css}">
+    <script>
+      $(function () {
+        // 点击图片返回首页
+        const logo = $("#logo_regist");
+        $(logo).fadeIn(1000);
+        $(logo).click(function () {
+          location.href = "/ssm/";
+        });
+
+        // 注册表单提交
+        $("#register").click(function (event) {
+          const reg_name = /^\w{4,16}$/;
+          const reg1 = /^\w{6,16}$/;
+          const reg2 = /^[a-z\d]+(\.[a-z\d]+)*@([\da-z](-[\da-z])?)+(\.{1,2}[a-z]+)+$/;
+
+          const usernameVal = $(":text[name='username']").val();
+          const password = $(":password[name='password']").val();
+          const confirmPWD = $(":password[name='confirmPWD']").val();
+          const email = $(":text[name='email']").val();
+          const codeVal = $(":text[name='code']").val();
+          const warnMsg = $("#registerWarn");
+
+          if (!reg_name.test(usernameVal)) {
+            warnMsg.text("用户名应为4~16位字母、数字组合");
+            return false;
+          }
+          if (!reg1.test(password)) {
+            warnMsg.text("密码应为6~16位字母、数字组合");
+            return false;
+          }
+          if (password !== confirmPWD) {
+            warnMsg.text("两次密码不相同");
+            return false;
+          }
+          if (!reg2.test(email)) {
+            warnMsg.text("输入的邮箱不符合邮箱地址规则");
+            return false;
+          }
+          if (codeVal === "" || codeVal == null) {
+            warnMsg.text("请输入验证码");
+            return false;
+          }
+          warnMsg.val(""); // 无违规，清除提示内容
+
+          // 通过AJAX向服务器发送请求判断验证码是否正确
+          var flag1 = false;
+          $.ajax({
+            url : "http://localhost:8080/ssm/ajaxCode",
+            data : {code : codeVal},
+            type : "GET",
+            async : false,  // 开启同步
+            dataType : "json",
+            success : function (data) {
+              if (data.checkCode) {
+                flag1 = true;
+              }
+            }
+          });
+          if (!flag1) {
+            alert("验证码错误");
+            $("#code").val("");
+            event.preventDefault();
+            return false;
+          }
+
+          // 通过AJAX向服务器发送请求判断用户名是否可用
+          var flag2 = false;
+          $.ajax({
+            url : "http://localhost:8080/ssm/ajaxExistsUsername",
+            data : {username : usernameVal},
+            type : "GET",
+            async : false,  // 开启同步
+            dataType : "json",
+            success : function (data) {
+              if (data.checkUsername) {
+                flag2 = true;
+              }
+            }
+          });
+          if (flag2) {
+            alert("用户名'" + usernameVal + "'已存在，请更换注册用户名");
+            event.preventDefault();
+            return false;
+          }
+        });
+
+        // 点击验证图片更换验证码
+        $("#code-img").click(function () {
+          this.src = "http://localhost:8080/ssm/kaptcha.jpg?date=" + new Date();  // 避免浏览器缓存，加一个随机参数
+        });
+      });
+    </script>
+</head>
+<body>
+<div class="main">
+  <div class="login_left">
+    <img class="logo" id="logo_regist" th:src="@{/static/img/register.jpg}" />
+  </div>
+  <div class="content">
+    <div class="title">
+      <h1>Welcome to My Website</h1>
+    </div>
+    <div class="blank"></div>
+    <div id="regist_box" class="box">
+      <div class="box_title">
+        <label style="font-size: 20px"><b>注册</b></label>
+        <span id="registerWarn" class="warnMsg" th:text="${registerMsg}"  ></span>
+        <input id="codeMsg" type="hidden" th:value="${codeMsg}">
+      </div><br />
+      <div class="show">
+        <form th:action="@{/userRegister}" th:method="post" id="register_form">
+          <div class="txt-item">
+            <label for="username">用户名称：</label><input type="text" class="txt" name="username" id="username" placeholder="请输入用户名" th:value="${username}" />
+          </div>
+          <div class="txt-item">
+            <label for="password">用户密码：</label><input type="password" class="txt" name="password" id="password" placeholder="请输入密码" />
+          </div>
+          <div class="txt-item">
+            <label for="confirmPWD">确认密码：</label><input type="password" class="txt" name="confirmPWD" id="confirmPWD" placeholder="请确认密码" />
+          </div>
+          <div class="txt-item">
+            <label for="email">电子邮件：</label><input type="text" class="txt" name="email" id="email" placeholder="请输入邮箱地址" th:value="${email}" />
+          </div>
+          <div id="div-code" style="width: 100%;height: 60px;">
+            <label for="code"></label><input type="text" class="txt" name="code" id="code" placeholder="请输入验证码" style="width: 60%;float: left">
+            <div style="text-align: center;float: left;width: 35%;height: 100%">
+              <img id="code-img" src="kaptcha.jpg" style="width: 100%;height: 42px;" />
+            </div>
+          </div>
+          <input id="register" th:type="submit" class="button" value="注册" />
+          <div style="height: 10px"></div>
+          <a id="back-login" th:href="@{/login}" class="button">返回登录</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="footer" style="text-align: center;font-size: 10px;color: #cccccc;height: 15px">
+  <span style="text-align: center">
+    Dershi.Copyright ©2022
+  </span>
+</div>
+</body>
+</html>

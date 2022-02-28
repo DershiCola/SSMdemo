@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
+<input id="pageNo" type="hidden" th:value="${pageInfo.getPageNum()}">
+<input id="pageSize" type="hidden" th:value="${pageInfo.getPageSize()}">
+<input id="totalPages" type="hidden" th:value="${pageInfo.getPages()}">
+<input id="totalBooks" type="hidden" th:value="${pageInfo.getTotal()}">
+<div>
+    <a id="pageFirst" class="item-pageNo" th:href="@{/book/page/1}">首页</a>
+    <a id="pageUp" class="item-pageNo" th:href="@{'/book/page/' + ${pageInfo.getPageNum() - 1}}">上一页</a>
+    第
+    <span id="pages"></span>
+    页
+    <a id="pageDown" class="item-pageNo" th:href="@{'/book/page/' + ${pageInfo.getPageNum() + 1}}">下一页</a>
+    <a id="pageLast" class="item-pageNo" th:href="@{'/book/page/' + ${pageInfo.getTotal()}}">末页</a>
+    <script type="text/javascript">
+        $(function () {
+            var pageNo = $("#pageNo").val();
+            var totalPages = $("#totalPages").val();
+            var begin;
+            var end;
+            if (pageNo === 1) {
+                $("#pageFirst").attr("disabled", true);
+                $("#pageFirst").removeAttr("href");
+                $("#pageUp").attr("disabled", true);
+                $("#pageUp").removeAttr("href");
+            }
+            if (pageNo === totalPages) {
+                $("#pageLast").attr("disabled", true);
+                $("#pageLast").removeAttr("href");
+                $("#pageDown").attr("disabled", true);
+                $("#pageDown").removeAttr("href");
+            }
+            if (totalPages <= 5) {
+                begin = 1;
+                end = totalPages;
+            } else if (totalPages > 5) {
+                if (pageNo <= 3) {
+                    begin = 1;
+                    end = 5;
+                } else if (pageNo >= totalPages -3) {
+                    begin = totalPages - 4;
+                    end = totalPages;
+                } else {
+                    begin = pageNo - 2;
+                    end = pageNo + 2;
+                }
+            }
+            for (let i = begin; i <= end ; i++) {
+                createA(i);
+            }
+        });
+
+        function createA(pageNo) {
+            var a = document.createElement("a");
+            if (pageNo === $("#pageNo").val()) {
+                a.innerHTML = 'disabled=' + '"' + 'true' + '" ' + 'onclick=' + '"' + 'return false' + '"';
+                a.text = "【" + pageNo + "】";
+            } else {
+                a.innerHTML = 'href=' + '"' + '/ssm/book/page/' + pageNo + '"';
+                a.text =  pageNo;
+            }
+            a.className = "item-pageNo";
+            a.insertBefore(a, $("#pages").lastChild);
+        }
+    </script>
+</div>
+</html>

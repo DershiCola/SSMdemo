@@ -1,0 +1,10 @@
+.tooltip {
+  height: 25px;
+  text-align: center;
+  opacity: 1;
+  transition: opacity 1s
+}
+
+.tooltiptext {
+
+}

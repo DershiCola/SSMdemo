@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>regist_success</title>
+  <script th:src="@{/static/js/jquery-3.6.0.js}"></script>
+  <link rel="stylesheet" th:href="@{/static/css/login.css}">
+  <style type="text/css">
+    #back-login2 {
+      color: #555;
+      width: 150px;
+      height: 40px;
+      font-size: 18px;
+    }
+    #all {
+      border: solid 5px deepskyblue;
+    }
+  </style>
+  <script>
+    $(function () {
+      $("img:first").fadeIn(1000);
+    });
+  </script>
+</head>
+<body>
+<div id="all">
+  <h1 style="color: hotpink">注册成功</h1>
+  <div align="center">
+    <a id="back-login2" th:href="@{/login}" class="button">返回登录</a>
+  </div><br>
+  <div align="center">
+    <img style="max-height: 56%;max-width: 56%" th:src="@{/static/img/registerSuccess.jpg}" hidden="hidden" />
+  </div>
+</div>
+</body>
+</html>

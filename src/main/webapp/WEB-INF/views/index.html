@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Dershi的网站</title>
+    <script th:src="@{/static/js/jquery-3.6.0.js}"></script>
+    <link rel="stylesheet" type="text/css" th:href="@{/static/css/index.css}">
+    <script>
+        $(function () {
+            $(".needLogin").click(function () {
+                // 通过AJAX向服务器发送请求判断登录session
+                var flag = false;
+                $.ajax({
+                    url : "http://localhost:8080/ssm/loginStatus",
+                    type : "GET",
+                    async : false,  // 开启同步
+                    dataType : "json",
+                    success : function (data) {
+                        if (data.loginStatus) {
+                            flag = true;
+                        }
+                    }
+                });
+                if (!flag) {
+                    alert("请先登录");
+                }
+            });
+        });
+    </script>
+</head>
+<body ondragstart="return false" >
+    <div class="home">
+        <input type="hidden" id="loginMsg" th:value="${session.loginMsg}">
+        <div class="content">
+            <div class="stars"></div>
+            <img class="bgc" th:src="@{/static/img/index/64399918_p1.png}" width="100%" alt="">
+            <h3 class="title">欢迎来到Dershi的个人网站</h3>
+            <h3 class="titles">记录喜欢的东西</h3>
+            <div class='ribbon'>
+                <a th:href="@{/}"><span>首页</span></a>
+                <a class="needLogin" th:href="@{/book/page/1}"><span>书籍</span></a>
+                <a class="needLogin" th:href="@{/anime/page/1}"><span>动漫</span></a>
+            </div>
+        </div>
+
+        <audio autoplay="autoplay" id="audio" loop="loop">
+                <source th:src="@{/static/music/BGM.mp3}" type="audio/MP3">
+        </audio>
+        <img id="player" class="music_img" th:src="@{/static/music/music-note.png}" alt="">
+    </div>
+</body>
+<script>
+    $(function () {
+        let music = $("#audio")[0]; // jQuery对象转dom对象
+        let musicImg = $("#player");
+        // setTimeout(() => {music.play();}, 1000);
+        musicImg.click(function () {
+           if (music.paused) {
+               music.play();
+           } else
+               music.pause();
+        });
+    })
+</script>
+</html>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dershi.dao.BookMapper">
+    <!--  开启二级缓存  -->
+    <cache
+            eviction="FIFO"
+            flushInterval="60000"
+            readOnly="true"
+            size="128"
+    />
+
+    <select id="getAllBooks" resultType="book">
+        select * from book
+    </select>
+
+    <select id="getBookById" resultType="book">
+        select * from book where book_id=#{bookId}
+    </select>
+
+    <insert id="addBook" parameterType="book" useGeneratedKeys="true" keyProperty="bookId">
+        insert into book
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="bookName != null and bookName != ''">book_name,</if>
+            <if test="author != null and author != ''">author,</if>
+            <if test="press != null and press != ''">press,</if>
+            <if test="imgPath != null and imgPath != ''">img_path,</if>
+            <if test="bookImpression != null and bookImpression != ''">book_impression</if>
+        </trim>
+        <trim prefix="values(" suffix=")" suffixOverrides=",">
+            <if test="bookName != null and bookName != ''">#{bookName},</if>
+            <if test="author != null and author != ''">#{author},</if>
+            <if test="press != null and press != ''">#{press},</if>
+            <if test="imgPath != null and imgPath != ''">#{imgPath},</if>
+            <if test="bookImpression != null and bookImpression != ''">#{bookImpression}</if>
+        </trim>
+    </insert>
+
+    <delete id="deleteBookById">
+        delete from book where book_id=#{bookId}
+    </delete>
+
+    <update id="updateBookById" parameterType="map">
+        update book
+        <set>
+            <if test="bookName != null">book_name=#{bookName},</if>
+            <if test="author != null">author=#{author},</if>
+            <if test="press != null">press=#{press},</if>
+            <if test="imgPath != null">img_path=#{imgPath},</if>
+            <if test="bookImpression != null">book_impression=#{bookImpression}</if>
+        </set>
+        where book_id=#{bookId}
+    </update>
+</mapper>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+<!--  1.扫描service包  -->
+    <context:component-scan base-package="com.dershi.service" />
+
+<!--  2.事务控制的配置  -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="pooledDataSource" />
+    </bean>
+<!--  开启基于注解的事务，使用xml配置形式的事务  -->
+<!--    <aop:config>-->
+<!--        &lt;!&ndash;  切入点表达式  &ndash;&gt;-->
+<!--        <aop:pointcut id="txPoint" expression="execution(* com.dershi.service..*(..))"/>-->
+<!--        &lt;!&ndash;  事务增强  &ndash;&gt;-->
+<!--        <aop:advisor advice-ref="txAdvice" pointcut-ref="txPoint" />-->
+<!--    </aop:config>-->
+<!--    &lt;!&ndash;  配置事务增强，事务如何切入  &ndash;&gt;-->
+<!--    <tx:advice id="txAdvice">-->
+<!--        <tx:attributes>-->
+<!--            &lt;!&ndash;  所有方法都是事务方法  &ndash;&gt;-->
+<!--            <tx:method name="*"/>-->
+<!--            &lt;!&ndash;  get开始的方法，当做是查询  &ndash;&gt;-->
+<!--            <tx:method name="get*" read-only="true"/>-->
+<!--        </tx:attributes>-->
+<!--    </tx:advice>-->
+</beans>
